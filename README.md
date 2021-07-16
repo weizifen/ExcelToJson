@@ -1,4 +1,5 @@
-# Excel2Unity
+# UnityExcelTool
+> 项目参考了[Excel2Unity](https://github.com/qinyuanpei/Excel2Unity)并进行了魔改
 ## 支持类型
 `json, csv`
 ## 格式
