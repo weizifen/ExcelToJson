@@ -158,14 +158,7 @@ public class ExcelTools : EditorWindow
 			}else if(indexOfFormat==1){
 				output=excelPath.Replace(".xlsx",".csv");
 				excel.ConvertToCSV(output,encoding, isDesc);
-			}else if(indexOfFormat==2){
-				output=excelPath.Replace(".xlsx",".xml");
-				excel.ConvertToXml(output);
-			}else if (indexOfFormat == 3)
-            {
-                output = excelPath.Replace(".xlsx", ".lua");
-                excel.ConvertToLua(output, encoding);
-            }
+			}
 
 			//判断是否保留源文件
 			if(!keepSource)
