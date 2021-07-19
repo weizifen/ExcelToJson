@@ -50,7 +50,7 @@ public class ExcelTools : EditorWindow
 	/// <summary>
 	/// 是否保留原始文件
 	/// </summary>
-	private static bool keepSource=true;
+	private static bool keepSource=false;
 	
 	/// <summary>
 	/// 第一行默认为策划用的中文语义
