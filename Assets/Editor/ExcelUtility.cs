@@ -73,7 +73,7 @@ public class ExcelUtility
 			Dictionary<string, object> row = new Dictionary<string, object> ();
 			for (int j = 0; j < colCount; j++) {
 				//读取第1行数据作为表头字段
-				string field = mSheet.Rows [readIndex - 1] [j].ToString ();
+				string field = mSheet.Rows [0] [j].ToString ();
 				
 				var isEmpty = field.Contains("!");
 				var isEmpty2 = field.Contains("#");
