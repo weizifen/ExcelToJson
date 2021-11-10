@@ -110,7 +110,7 @@ public partial class ExcelUtility
 		var arr = output.Split('/');
 		var csName = arr[arr.Length - 1].Replace(".cs", "");
 		var ext = new ExcelMediumData();
-		ext.excelName = "test";
+		ext.excelName = csName;
 		ext.propertyType = new Dictionary<string, string>();
 		// ext.dataEachLine = new List<Dictionary<string, string>>();
 		

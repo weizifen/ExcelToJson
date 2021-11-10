@@ -51,17 +51,21 @@ public partial class ExcelUtility
     //数据赋值代码
     private static StringBuilder CreateDataClass(string dataName, Dictionary<string, string> propertyType)
     {
+        var nameSpace = "namespace HotUpdateScripts.Xiuxian";
         StringBuilder classSource = new StringBuilder();
-        classSource.Append("[System.Serializable]\n");
-        classSource.Append("public class " + dataName + "\n");
+        classSource.Append(nameSpace);
         classSource.Append("{\n");
-        classSource.Append("\t#region --- Auto Config --- \n");
+        classSource.Append("\t[System.Serializable]\n");
+        classSource.Append("\tpublic class " + dataName + "\n");
+        classSource.Append("\t{\n");
+        classSource.Append("\t\t#region --- Auto Config --- \n");
         foreach (var item in propertyType)
         {
             classSource.Append(CreateCodeProperty(item.Key, item.Value));
         }
 
-        classSource.Append("\t#endregion \n");
+        classSource.Append("\t\t#endregion \n");
+        classSource.Append("\t}\n");
         classSource.Append("}\n");
         return classSource;
     }
@@ -103,7 +107,7 @@ public partial class ExcelUtility
         else
             type = "string";
 
-        string propertyStr = "\tpublic " + type + generic + " " + name + ";\n";
+        string propertyStr = "\t\tpublic " + type + generic + " " + name + ";\n";
         return propertyStr;
     }
 

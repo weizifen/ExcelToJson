@@ -9,7 +9,7 @@ using UnityEditor;
 
 namespace HotUpdateScripts.Xiuxian{
 	[System.Serializable]
-	public class ItemData
+	public class Item2Data
 	{
 		#region --- Auto Config --- 
 		public string id;
