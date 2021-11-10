@@ -10,7 +10,7 @@ using System.Reflection.Emit;
 using System;
 using Newtonsoft.Json;
 
-public class ExcelUtility
+public partial class ExcelUtility
 {
 
 	/// <summary>
@@ -56,12 +56,12 @@ public class ExcelUtility
 		List<Dictionary<string, object>> table = new List<Dictionary<string, object>> ();
 
 		
-		var readIndex = 2;
+		var readIndex = 4;
 		if (!isDesc)
 		{
-			readIndex = 1;
+			readIndex = 3;
 		}
-		
+
 		//读取数据
 		for (int i = readIndex; i < rowCount; i++) {
 			// 解决空白行
@@ -104,7 +104,35 @@ public class ExcelUtility
 				textWriter.Write (json);
 			}
 		}
+		
+		
+		var output = JsonPath.Replace(".json",".cs");
+		var arr = output.Split('/');
+		var csName = arr[arr.Length - 1].Replace(".cs", "");
+		var ext = new ExcelMediumData();
+		ext.excelName = "test";
+		ext.propertyType = new Dictionary<string, string>();
+		// ext.dataEachLine = new List<Dictionary<string, string>>();
+		
+		//读取数据
+		for (int k = 0; k < colCount; k++) {
+			//读取第2行数据作为表头字段
+			string field = mSheet.Rows [0] [k].ToString ();
+			//读取第3行数据作为类型
+			string typeField = mSheet.Rows [2] [k].ToString ();
+			ext.propertyType.Add(field, typeField);
+		}
+
+		
+		var codeStr = CreateAssetCode(ext);
+		//写入文件
+		using (FileStream fileStream=new FileStream(output,FileMode.Create,FileAccess.Write)) {
+			using (TextWriter textWriter = new StreamWriter(fileStream, encoding)) {
+				textWriter.Write (codeStr);
+			}
+		}
 	}
+	
 	
 	
 
