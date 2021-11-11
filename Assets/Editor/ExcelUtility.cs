@@ -35,7 +35,7 @@ public partial class ExcelUtility
 	/// </summary>
 	/// <param name="JsonPath">Json文件路径</param>
 	/// <param name="Header">表头行数</param>
-	public void ConvertToJson (string JsonPath, Encoding encoding, bool isDesc)
+	public void ConvertToJson (string JsonPath, Encoding encoding, bool isDesc, string outputCs = "")
 	{
 		//判断Excel文件中是否存在数据表
 		if (mResultSet.Tables.Count < 1)
@@ -104,11 +104,20 @@ public partial class ExcelUtility
 				textWriter.Write (json);
 			}
 		}
+
+		var output = "";
+		if (outputCs == "")
+		{
+			output = JsonPath.Replace(".json",".cs");
+		}
+		else
+		{
+			output = outputCs;
+		}
 		
-		
-		var output = JsonPath.Replace(".json",".cs");
 		var arr = output.Split('/');
 		var csName = arr[arr.Length - 1].Replace(".cs", "");
+
 		var ext = new ExcelMediumData();
 		ext.excelName = csName;
 		ext.propertyType = new Dictionary<string, string>();
