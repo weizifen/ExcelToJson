@@ -1,0 +1,35 @@
+﻿{
+  "BS001": {
+    "ID": "BS001",
+    "Name": "鬼道士",
+    "AssetName": "BS001",
+    "HP": 100,
+    "Attack": 15,
+    "Defence": 0,
+    "Enemy": 1,
+    "EnemyList": "f2",
+    "EnemyIdList": 244
+  },
+  "BS002": {
+    "ID": "BS002",
+    "Name": "钟馗",
+    "AssetName": "BS002",
+    "HP": 352,
+    "Attack": 22,
+    "Defence": 3,
+    "Enemy": 33,
+    "EnemyList": "f3",
+    "EnemyIdList": 255
+  },
+  "BS003": {
+    "ID": "BS003",
+    "Name": "",
+    "AssetName": "BS003",
+    "HP": 332,
+    "Attack": 3,
+    "Defence": 44,
+    "Enemy": 555,
+    "EnemyList": "f4",
+    "EnemyIdList": 266
+  }
+}

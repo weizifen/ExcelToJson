@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using excel2json;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
@@ -16,10 +17,28 @@ namespace Editor
         public List<Object> ExcelList;
 
         [Title("选择格式类型")] [HideLabel] [EnumPaging]
-        public FormatType formatType = FormatType.JSON;
-
+        public ExportType exportType = ExportType.Array;
+        
         [Title("选择编码类型")] [HideLabel] [ValueDropdown("codeTypeList")]
         public int codeType = 0;
+
+        [Title("小写")] [ShowInInspector] [LabelText("小写")]
+        public bool lowcase = false;
+        
+        [ReadOnly][LabelText("前三行")]
+        public int headerRows = 3;
+        
+        public bool sheetName = false;
+        
+        
+        [ReadOnly][LabelText("前三行")]
+        public string excludePrefix = "#";
+
+        public bool convertJsonStringInCeil = true;
+
+        [Title("选择格式类型")] [HideLabel] [EnumPaging]
+        public FormatType formatType = FormatType.JSON;
+        
 
         [Title("输出文件夹(json,csv), 默认(Assets/Excel)")] [HideLabel] [FolderPath]
         public string outPath = "Assets/Excel";
@@ -37,23 +56,28 @@ namespace Editor
             foreach (Object obj in ExcelList)
             {
                 var assetsPath = AssetDatabase.GetAssetPath(obj);
+                string excelName = obj.name;
+
                 //获取Excel文件的绝对路径
                 string excelPath = pathRoot + "/" + assetsPath;
-                //构造Excel工具类
-                ExcelUtility excel = new ExcelUtility(excelPath);
 
+                //-- Header
+                int header = headerRows;
+                
+                //-- Encoding
                 //判断编码类型
                 Encoding encoding = null;
                 if (codeType == 0)
                 {
-                    encoding = Encoding.GetEncoding("utf-8");
+                    encoding = Encoding.GetEncoding("utf-8"); // utf8-nobom
                 }
                 else if (codeType == 1)
                 {
                     encoding = Encoding.GetEncoding("gb2312");
                 }
-
-                //判断输出类型
+                
+                //-- Export path
+                string exportPath;
                 string output = "";
                 string outputCs = "";
                 if (formatType == FormatType.JSON)
@@ -61,14 +85,25 @@ namespace Editor
                     output = pathRoot + "/" + outPath + "/" + obj.name + ".json";
                     outputCs = pathRoot + "/" + outCsPath + "/" + obj.name + ".cs";
                     
-                    excel.ConvertToJson(output, encoding, true, outputCs);
+                    // excel.ConvertToJson(output, encoding, true, outputCs);
                 }
-                else if (formatType == FormatType.CSV)
-                {
-                    output = excelPath.Replace(".xlsx", ".csv");
-                    excel.ConvertToCSV(output, encoding, true);
-                }
+                
+                //-- Load Excel
+                ExcelLoader excel = new ExcelLoader(excelPath, headerRows);
 
+                bool tmpExportArray = exportType != ExportType.Array;
+                //-- export
+                JsonExporter exporter = new JsonExporter(excel, lowcase, tmpExportArray, "yyyy/MM/dd", sheetName, header, excludePrefix, convertJsonStringInCeil, false);
+                exporter.SaveToFile(output, encoding);
+                
+                //-- 生成C#定义文件
+                if (outputCs.Length > 0)
+                {
+                    CSDefineGenerator generator = new CSDefineGenerator(excelName, excel, excludePrefix);
+                    generator.SaveToFile(outputCs, encoding);
+                }
+                
+                
                 //判断是否保留源文件
                 if (!keepSource)
                 {
@@ -99,10 +134,14 @@ namespace Editor
         };
         // [ShowInInspector] public string listTmp => "Type: List|string, Value: JOJO,BABA";
 
+        public enum ExportType
+        {
+            Array,
+            DictObject
+        }
         public enum FormatType
         {
             JSON,
-            CSV
         }
 
         private static IEnumerable codeTypeList = new ValueDropdownList<int>()
