@@ -1,4 +1,5 @@
 # UnityExcelTool
+> 工具依赖odin, 购买地址[odin](https://assetstore.unity.com/packages/tools/utilities/odin-inspector-and-serializer-89041)
 > 快捷键`command + e`
 ## 支持类型
 `json`
