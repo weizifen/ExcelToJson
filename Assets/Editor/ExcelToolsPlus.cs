@@ -51,16 +51,16 @@ namespace Editor
         [FoldoutGroup("扩展配置")] [Title("保留Excel源文件")] [ShowInInspector] [LabelText("保留源文件")]
         public bool keepSource = true;
 
-
+        [InfoBox("因不可抗力，生成json的时候校验会用到生成类的相关脚本，立马生成类如果没有返回unity， 无法重新编译 Assembly, 所以此时生成脚本的时候会关掉该editor", infoMessageType: InfoMessageType.Warning)]
         [Button(ButtonSizes.Gigantic)]
-        [LabelText("生成代码")]
+        [LabelText("1. 生成代码")]
         public void GenCode()
         {
             this.Exec(false);
         }
         
         [Button(ButtonSizes.Gigantic)]
-        [LabelText("生成Json")]
+        [LabelText("2. 生成Json")]
         public void GenJson()
         {
             this.Exec(true);
@@ -179,7 +179,7 @@ namespace Editor
 
         private static string pathRoot;
 
-        [MenuItem("Tools/ExcelTools")]
+        [MenuItem("Tools/ExcelTools %E")]
         private static void OpenWindow()
         {
             var window = GetWindow<ExcelToolsPlus>();
@@ -191,7 +191,7 @@ namespace Editor
             pathRoot = pathRoot.Substring(0, pathRoot.LastIndexOf("/"));
 
             // Nifty little trick to quickly position the window in the middle of the editor.
-            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(700, 700);
+            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(700, 900);
         }
 
         protected override void OnGUI()
