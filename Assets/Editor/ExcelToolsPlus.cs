@@ -27,6 +27,9 @@ namespace Editor
 
         [FoldoutGroup("扩展配置")] [ReadOnly] [LabelText("前三行")]
         public int headerRows = 3;
+        
+        [FoldoutGroup("扩展配置")] [ReadOnly] [LabelText("导出客户端, 客户端前缀C#， 服务端前缀S#")]
+        public bool outputClient = true;
 
         [FoldoutGroup("扩展配置")] [LabelText("forceSheetName")]
         public bool sheetName = false;
@@ -116,7 +119,7 @@ namespace Editor
                 {
                     if (outputCs.Length > 0)
                     {
-                        CSDefineGenerator generator = new CSDefineGenerator(excelName, excel, excludePrefix, setNamespace);
+                        CSDefineGenerator generator = new CSDefineGenerator(excelName, excel, excludePrefix, setNamespace, outputClient);
                         generator.SaveToFile(outputCs, encoding);
 
                         Debug.Log("tete");
@@ -126,7 +129,7 @@ namespace Editor
                 else
                 {
                     JsonExporter exporter = new JsonExporter(excel, lowcase, tmpExportArray, "yyyy/MM/dd", sheetName,
-                        header, excludePrefix, convertJsonStringInCeil, false);
+                        header, excludePrefix, convertJsonStringInCeil, false, outputClient);
                     exporter.SaveToFile(output, encoding);   
                 }
 

@@ -1,5 +1,5 @@
 # UnityExcelTool
-
+> 快捷键`command + e`
 ## 支持类型
 `json`
 ## 格式
@@ -27,6 +27,8 @@
 ## 输出地方
 * 支持设置CS文件及Json文件输出位置，如未设置默认Assets/Excel
 
+## 额外支持
+* 支持过滤服务端相关字段![](media/16367076913894.jpg)
 
 ## example
 excel: [ExampleData22](media/ExampleData22.xlsx)

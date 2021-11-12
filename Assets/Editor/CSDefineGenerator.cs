@@ -4,6 +4,7 @@ using System.Data;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using Editor;
 
 namespace excel2json
 {
@@ -28,7 +29,7 @@ namespace excel2json
             }
         }
 
-        public CSDefineGenerator(string excelName, ExcelLoader excel, string excludePrefix, string setNamespace)
+        public CSDefineGenerator(string excelName, ExcelLoader excel, string excludePrefix, string setNamespace, bool outputClient = true)
         {
             //-- 创建代码字符串
             StringBuilder sb = new StringBuilder();
@@ -50,7 +51,7 @@ namespace excel2json
             for (int i = 0; i < excel.Sheets.Count; i++)
             {
                 DataTable sheet = excel.Sheets[i];
-                sb.Append(_exportSheet(sheet, excludePrefix));
+                sb.Append(_exportSheet(sheet, excludePrefix, outputClient));
             }
             sb.AppendLine("}");
             sb.AppendLine();
@@ -59,7 +60,7 @@ namespace excel2json
             mCode = sb.ToString();
         }
 
-        private string _exportSheet(DataTable sheet, string excludePrefix)
+        private string _exportSheet(DataTable sheet, string excludePrefix, bool outputClient = true)
         {
             if (sheet.Columns.Count < 0 || sheet.Rows.Count < 2)
                 return "";
@@ -79,9 +80,19 @@ namespace excel2json
                 string columnName = column.ToString();
                 if (excludePrefix.Length > 0 && columnName.StartsWith(excludePrefix))
                     continue;
+                if (outputClient)
+                {
+                    if (columnName.StartsWith(Config.ServerSignal)) // 忽略服务端标志位相关的
+                        continue;
+
+                    if (columnName.StartsWith(Config.ClientSignal))
+                    {
+                        columnName = columnName.Substring(2);
+                    }
+                }
 
                 FieldDef field;
-                field.name = column.ToString();
+                field.name = columnName;
                 var fieldType = GetProperty(typeRow[column].ToString());
                 Console.WriteLine(fieldType);
                 field.type = fieldType;

@@ -6,6 +6,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Editor;
 using Newtonsoft.Json;
 
 namespace excel2json
@@ -28,7 +29,7 @@ namespace excel2json
         /// 构造函数：完成内部数据创建
         /// </summary>
         /// <param name="excel">ExcelLoader Object</param>
-        public JsonExporter(ExcelLoader excel, bool lowcase, bool exportArray, string dateFormat, bool forceSheetName, int headerRows, string excludePrefix, bool cellJson, bool allString)
+        public JsonExporter(ExcelLoader excel, bool lowcase, bool exportArray, string dateFormat, bool forceSheetName, int headerRows, string excludePrefix, bool cellJson, bool allString, bool outputClient)
         {
             mHeaderRows = headerRows - 1;
             List<DataTable> validSheets = new List<DataTable>();
@@ -55,7 +56,7 @@ namespace excel2json
             {   // single sheet
 
                 //-- convert to object
-                object sheetValue = convertSheet(validSheets[0], exportArray, lowcase, excludePrefix, cellJson, allString);
+                object sheetValue = convertSheet(validSheets[0], exportArray, lowcase, excludePrefix, cellJson, allString, outputClient);
                 //-- convert to json string
                 mContext = JsonConvert.SerializeObject(sheetValue, jsonSettings);
             }
@@ -65,7 +66,7 @@ namespace excel2json
                 Dictionary<string, object> data = new Dictionary<string, object>();
                 foreach (var sheet in validSheets)
                 {
-                    object sheetValue = convertSheet(sheet, exportArray, lowcase, excludePrefix, cellJson, allString);
+                    object sheetValue = convertSheet(sheet, exportArray, lowcase, excludePrefix, cellJson, allString, outputClient);
                     data.Add(sheet.TableName, sheetValue);
                 }
 
@@ -77,7 +78,7 @@ namespace excel2json
         private Dictionary<int, PropertyInfo> column2Property;
         private Type classType;
         
-        private object convertSheet(DataTable sheet, bool exportArray, bool lowcase, string excludePrefix, bool cellJson, bool allString)
+        private object convertSheet(DataTable sheet, bool exportArray, bool lowcase, string excludePrefix, bool cellJson, bool allString, bool outputClient)
         {
             
             #region 第一行 记录一下字段
@@ -101,6 +102,16 @@ namespace excel2json
                 string columnName = column.ToString();
                 if (excludePrefix.Length > 0 && columnName.StartsWith(excludePrefix))
                     continue;
+                if (outputClient)
+                {
+                    if (columnName.StartsWith(Config.ServerSignal)) // 忽略服务端标志位相关的
+                        continue;
+                    
+                    if (columnName.StartsWith(Config.ClientSignal))
+                    {
+                        columnName = columnName.Substring(2);
+                    }
+                }
             
                 var property = classType.GetProperty(columnName, BindingFlags.Instance | BindingFlags.Public);
                 if (property != null)
@@ -109,11 +120,11 @@ namespace excel2json
             }
             #endregion
             if (exportArray)
-                return convertSheetToArray(sheet, lowcase, excludePrefix, cellJson, allString);
+                return convertSheetToArray(sheet, lowcase, excludePrefix, cellJson, allString, outputClient);
             else
-                return convertSheetToDict(sheet, lowcase, excludePrefix, cellJson, allString);
+                return convertSheetToDict(sheet, lowcase, excludePrefix, cellJson, allString, outputClient);
         }
-        private object convertSheetToArray(DataTable sheet, bool lowcase, string excludePrefix, bool cellJson, bool allString)
+        private object convertSheetToArray(DataTable sheet, bool lowcase, string excludePrefix, bool cellJson, bool allString, bool outputClient)
         {
             List<object> values = new List<object>();
 
@@ -123,7 +134,7 @@ namespace excel2json
                 DataRow row = sheet.Rows[i];
 
                 values.Add(
-                    convertRowToDict(sheet, row, lowcase, firstDataRow, excludePrefix, cellJson, allString)
+                    convertRowToDict(sheet, row, lowcase, firstDataRow, excludePrefix, cellJson, allString, outputClient)
                     );
             }
 
@@ -133,7 +144,7 @@ namespace excel2json
         /// <summary>
         /// 以第一列为ID，转换成ID->Object的字典对象
         /// </summary>
-        private object convertSheetToDict(DataTable sheet, bool lowcase, string excludePrefix, bool cellJson, bool allString)
+        private object convertSheetToDict(DataTable sheet, bool lowcase, string excludePrefix, bool cellJson, bool allString, bool outputClient)
         {
             Dictionary<string, object> importData =
                 new Dictionary<string, object>();
@@ -146,7 +157,7 @@ namespace excel2json
                 if (ID.Length <= 0)
                     ID = string.Format("row_{0}", i);
 
-                var rowObject = convertRowToDict(sheet, row, lowcase, firstDataRow, excludePrefix, cellJson, allString);
+                var rowObject = convertRowToDict(sheet, row, lowcase, firstDataRow, excludePrefix, cellJson, allString, outputClient);
                 // 多余的字段
                 // rowObject[ID] = ID;
                 importData[ID] = rowObject;
@@ -158,7 +169,7 @@ namespace excel2json
         /// <summary>
         /// 把一行数据转换成一个对象，每一列是一个属性
         /// </summary>
-        private Dictionary<string, object> convertRowToDict(DataTable sheet, DataRow row, bool lowcase, int firstDataRow, string excludePrefix, bool cellJson, bool allString)
+        private Dictionary<string, object> convertRowToDict(DataTable sheet, DataRow row, bool lowcase, int firstDataRow, string excludePrefix, bool cellJson, bool allString, bool outputClient)
         {
             var rowData = new Dictionary<string, object>();
             int col = 0;
@@ -169,24 +180,17 @@ namespace excel2json
                 string columnName = column.ToString();
                 if (excludePrefix.Length > 0 && columnName.StartsWith(excludePrefix))
                     continue;
+                if (outputClient)
+                {
+                    if (columnName.StartsWith(Config.ServerSignal)) // 忽略服务端标志位相关的
+                        continue;
+                    
+                    if (columnName.StartsWith(Config.ClientSignal))
+                    {
+                        columnName = columnName.Substring(2);
+                    }
+                }
 
-                var dictConvert = row[column].ToString();
-                // if (dictConvert.Contains("|"))
-                // {
-                //     var resDic = new Dictionary<object, object>();
-                //     string[] strArray = dictConvert.Trim().Split('|');
-                //     foreach (var each in strArray)
-                //     {
-                //         string keyStr = each.Split(',')[0];
-                //         string valueStr = each.Split(',')[1];
-                //         object key = keyStr;
-                //         resDic.Add(key, valueStr);
-                //         var str = JsonConvert.SerializeObject(resDic) as object;
-                //         // Console.WriteLine("++++");
-                //         // Console.WriteLine(str);
-                //         row[column] = str;
-                //     }
-                // }
                 object value = row[column];
 
                 // 尝试将单元格字符串转换成 Json Array 或者 Json Object
@@ -227,7 +231,7 @@ namespace excel2json
                     value = value.ToString();
                 }
 
-                string fieldName = column.ToString();
+                string fieldName = columnName;
                 // 表头自动转换成小写
                 if (lowcase)
                     fieldName = fieldName.ToLower();

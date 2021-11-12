@@ -13,7 +13,6 @@ namespace HotUpdateScripts.Xiuxian
 	public class NPC
 	{
 		public string ID { get; set; } // 编号
-		public string AssetName { get; set; } // 资源编号
 		public int HP { get; set; } // 血
 		public int Attack { get; set; } // 攻击
 		public int Defence { get; set; } // 防御

@@ -1,7 +1,6 @@
 ﻿[
   {
     "ID": "BS001",
-    "AssetName": "BS001",
     "HP": 100,
     "Attack": 15,
     "Defence": 0,
@@ -23,7 +22,6 @@
   },
   {
     "ID": "BS002",
-    "AssetName": "BS002",
     "HP": 352,
     "Attack": 22,
     "Defence": 3,
@@ -45,7 +43,6 @@
   },
   {
     "ID": "BS003",
-    "AssetName": "BS003",
     "HP": 332,
     "Attack": 3,
     "Defence": 44,
