@@ -1,7 +1,6 @@
 ﻿[
   {
     "ID": "BS001",
-    "Name": "鬼道士",
     "AssetName": "BS001",
     "HP": 100,
     "Attack": 15,
@@ -16,7 +15,6 @@
   },
   {
     "ID": "BS002",
-    "Name": "钟馗",
     "AssetName": "BS002",
     "HP": 352,
     "Attack": 22,
@@ -31,7 +29,6 @@
   },
   {
     "ID": "BS003",
-    "Name": "",
     "AssetName": "BS003",
     "HP": 332,
     "Attack": 3,

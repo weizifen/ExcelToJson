@@ -138,7 +138,7 @@ namespace Editor
             // window.Close();
         }
 
-        [InfoBox("第一行字段名, 第二行中文注释，第三行类型，类型支持(int, float, bool, enum, list, dictionary)")] [ReadOnly]
+        [InfoBox("第一行字段名, 第二行中文注释，第三行类型，类型支持(int, float, bool, list, dictionary)")] [ReadOnly]
         public Dictionary<string, string> example = new Dictionary<string, string>()
         {
             { "int", "1" },
