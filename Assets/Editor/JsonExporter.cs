@@ -74,26 +74,21 @@ namespace excel2json
             }
         }
 
-        private object convertSheet(DataTable sheet, bool exportArray, bool lowcase, string excludePrefix, bool cellJson, bool allString)
-        {
-            if (exportArray)
-                return convertSheetToArray(sheet, lowcase, excludePrefix, cellJson, allString);
-            else
-                return convertSheetToDict(sheet, lowcase, excludePrefix, cellJson, allString);
-        }
-
         private Dictionary<int, PropertyInfo> column2Property;
         private Type classType;
-        private object convertSheetToArray(DataTable sheet, bool lowcase, string excludePrefix, bool cellJson, bool allString)
+        
+        private object convertSheet(DataTable sheet, bool exportArray, bool lowcase, string excludePrefix, bool cellJson, bool allString)
         {
-
+            
             #region 第一行 记录一下字段
             DataRow oneRow = sheet.Rows[0];
             // get field list
             var RuntimeAssembly = AppDomain.CurrentDomain.GetAssemblies().First(Assembly => Assembly.FullName.StartsWith("Assembly-CSharp"));
             classType = RuntimeAssembly.GetTypes().First(type =>
             {
-                return type.Name.Contains(sheet.TableName);
+                var tmpArr = type.Name.Split('.');
+                var str = tmpArr[tmpArr.Length - 1];
+                return str == sheet.TableName;
             });
             column2Property = new Dictionary<int, PropertyInfo>();
             DataRow typeRow = sheet.Rows[0];
@@ -112,9 +107,14 @@ namespace excel2json
                     column2Property[index] = property;
                 index += 1;
             }
-            
-
             #endregion
+            if (exportArray)
+                return convertSheetToArray(sheet, lowcase, excludePrefix, cellJson, allString);
+            else
+                return convertSheetToDict(sheet, lowcase, excludePrefix, cellJson, allString);
+        }
+        private object convertSheetToArray(DataTable sheet, bool lowcase, string excludePrefix, bool cellJson, bool allString)
+        {
             List<object> values = new List<object>();
 
             int firstDataRow = mHeaderRows;

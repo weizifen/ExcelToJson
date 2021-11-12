@@ -53,13 +53,20 @@ namespace Editor
 
 
         [Button(ButtonSizes.Gigantic)]
-        [LabelText("生成代码并生成Code")]
+        [LabelText("生成代码")]
+        public void GenCode()
+        {
+            this.Exec(false);
+        }
+        
+        [Button(ButtonSizes.Gigantic)]
+        [LabelText("生成Json")]
         public void GenJson()
         {
-            this.Exec();
+            this.Exec(true);
         }
 
-        public void Exec()
+        public void Exec(bool flag)
         {
             foreach (Object obj in ExcelList)
             {
@@ -105,16 +112,23 @@ namespace Editor
 
                 //-- 生成C#定义文件
 
-                if (outputCs.Length > 0)
+                if (flag == false)
                 {
-                    CSDefineGenerator generator = new CSDefineGenerator(excelName, excel, excludePrefix, setNamespace);
-                    generator.SaveToFile(outputCs, encoding);
+                    if (outputCs.Length > 0)
+                    {
+                        CSDefineGenerator generator = new CSDefineGenerator(excelName, excel, excludePrefix, setNamespace);
+                        generator.SaveToFile(outputCs, encoding);
+
+                        Debug.Log("tete");
+                        Debug.Log(excel == null);
+                    }   
                 }
-
-
-                JsonExporter exporter = new JsonExporter(excel, lowcase, tmpExportArray, "yyyy/MM/dd", sheetName,
-                    header, excludePrefix, convertJsonStringInCeil, false);
-                exporter.SaveToFile(output, encoding);
+                else
+                {
+                    JsonExporter exporter = new JsonExporter(excel, lowcase, tmpExportArray, "yyyy/MM/dd", sheetName,
+                        header, excludePrefix, convertJsonStringInCeil, false);
+                    exporter.SaveToFile(output, encoding);   
+                }
 
 
                 //判断是否保留源文件

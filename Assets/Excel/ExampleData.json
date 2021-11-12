@@ -1,0 +1,50 @@
+﻿[
+  {
+    "ID": "BS001",
+    "Name": "鬼道士",
+    "AssetName": "BS001",
+    "HP": 100,
+    "Attack": 15,
+    "Defence": 0,
+    "DateTest": [
+      "f1"
+    ],
+    "DateDict": {
+      "s": "aa",
+      "d": "bb",
+      "f": "cc"
+    }
+  },
+  {
+    "ID": "BS002",
+    "Name": "钟馗",
+    "AssetName": "BS002",
+    "HP": 352,
+    "Attack": 22,
+    "Defence": 3,
+    "DateTest": [
+      "f1"
+    ],
+    "DateDict": {
+      "s": "aa",
+      "d": "bb",
+      "f": "cc"
+    }
+  },
+  {
+    "ID": "BS003",
+    "Name": "",
+    "AssetName": "BS003",
+    "HP": 332,
+    "Attack": 3,
+    "Defence": 44,
+    "DateTest": [
+      "f1"
+    ],
+    "DateDict": {
+      "s": "aa",
+      "d": "bb",
+      "f": "cc"
+    }
+  }
+]
