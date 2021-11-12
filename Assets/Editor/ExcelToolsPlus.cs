@@ -13,59 +13,52 @@ namespace Editor
 {
     public class ExcelToolsPlus : OdinEditorWindow
     {
-        [BoxGroup("基础配置")]
-        [Title("资源收集")] [AssetList(Path = "Excel", CustomFilterMethod = "IsExcel")]
+        [BoxGroup("基础配置")] [Title("资源收集")] [AssetList(Path = "Excel", CustomFilterMethod = "IsExcel")]
         public List<Object> ExcelList;
-        
-        [BoxGroup("基础配置")]
-        [LabelText("选择格式类型")] [HideLabel] [EnumPaging]
+
+        [BoxGroup("基础配置")] [LabelText("选择格式类型")] [HideLabel] [EnumPaging]
         public ExportType exportType = ExportType.Array;
-        
-        [BoxGroup("基础配置")]
-        [Title("选择编码类型")] [HideLabel] [ValueDropdown("codeTypeList")]
+
+        [BoxGroup("基础配置")] [Title("选择编码类型")] [HideLabel] [ValueDropdown("codeTypeList")]
         public int codeType = 0;
-        
-        [BoxGroup("基础配置")]
-        [ShowInInspector] [LabelText("小写")]
+
+        [BoxGroup("基础配置")] [ShowInInspector] [LabelText("小写")]
         public bool lowcase = false;
-        
-        [FoldoutGroup("扩展配置")]
-        [ReadOnly][LabelText("前三行")]
+
+        [FoldoutGroup("扩展配置")] [ReadOnly] [LabelText("前三行")]
         public int headerRows = 3;
-        
-        [FoldoutGroup("扩展配置")]
-        [LabelText("forceSheetName")]
+
+        [FoldoutGroup("扩展配置")] [LabelText("forceSheetName")]
         public bool sheetName = false;
-        
-        [FoldoutGroup("扩展配置")]
-        [ReadOnly][LabelText("忽略标志位")]
+
+        [FoldoutGroup("扩展配置")] [ReadOnly] [LabelText("忽略标志位")]
         public string excludePrefix = "#";
 
-        [FoldoutGroup("扩展配置")]
-        public bool convertJsonStringInCeil = true;
+        [FoldoutGroup("扩展配置")] public bool convertJsonStringInCeil = true;
 
-        [FoldoutGroup("扩展配置")]
-        [Title("选择格式类型")] [HideLabel] [EnumPaging][ReadOnly]
+        [FoldoutGroup("扩展配置")] [Title("选择格式类型")] [HideLabel] [EnumPaging] [ReadOnly]
         public FormatType formatType = FormatType.JSON;
-        
-        [BoxGroup("基础配置")]
-        [Title("输出文件夹(json,csv), 默认(Assets/Excel)")] [HideLabel] [FolderPath]
+
+        [BoxGroup("基础配置")] [Title("输出文件夹(json,csv), 默认(Assets/Excel)")] [HideLabel] [FolderPath]
         public string outPath = "Assets/Excel";
 
-        [BoxGroup("基础配置")]
-        [Title("输出文件夹(cs), 默认(Assets/Excel)")] [HideLabel] [FolderPath]
+        [BoxGroup("基础配置")] [Title("输出文件夹(cs), 默认(Assets/Excel)")] [HideLabel] [FolderPath]
         public string outCsPath = "Assets/Excel";
-        
-        [BoxGroup("基础配置")]
-        [LabelText("设置命名空间")] [HideLabel]
+
+        [BoxGroup("基础配置")] [LabelText("设置命名空间")] [HideLabel]
         public string setNamespace = "HotUpdateScripts.Xiuxian";
-        
-        [FoldoutGroup("扩展配置")]
-        [Title("保留Excel源文件")] [ShowInInspector] [LabelText("保留源文件")]
+
+        [FoldoutGroup("扩展配置")] [Title("保留Excel源文件")] [ShowInInspector] [LabelText("保留源文件")]
         public bool keepSource = true;
-        
+
+
         [Button(ButtonSizes.Gigantic)]
-        [LabelText("执行")]
+        [LabelText("生成代码并生成Code")]
+        public void GenJson()
+        {
+            this.Exec();
+        }
+
         public void Exec()
         {
             foreach (Object obj in ExcelList)
@@ -78,7 +71,7 @@ namespace Editor
 
                 //-- Header
                 int header = headerRows;
-                
+
                 //-- Encoding
                 //判断编码类型
                 Encoding encoding = null;
@@ -90,7 +83,7 @@ namespace Editor
                 {
                     encoding = Encoding.GetEncoding("gb2312");
                 }
-                
+
                 //-- Export path
                 string exportPath;
                 string output = "";
@@ -99,27 +92,31 @@ namespace Editor
                 {
                     output = pathRoot + "/" + outPath + "/" + obj.name + ".json";
                     outputCs = pathRoot + "/" + outCsPath + "/" + obj.name + ".cs";
-                    
+
                     // excel.ConvertToJson(output, encoding, true, outputCs);
                 }
-                
+
                 //-- Load Excel
                 ExcelLoader excel = new ExcelLoader(excelPath, headerRows);
 
                 bool tmpExportArray = exportType == ExportType.Array;
-        
+
                 //-- export
-                JsonExporter exporter = new JsonExporter(excel, lowcase, tmpExportArray, "yyyy/MM/dd", sheetName, header, excludePrefix, convertJsonStringInCeil, false);
-                exporter.SaveToFile(output, encoding);
-                
+
                 //-- 生成C#定义文件
+
                 if (outputCs.Length > 0)
                 {
                     CSDefineGenerator generator = new CSDefineGenerator(excelName, excel, excludePrefix, setNamespace);
                     generator.SaveToFile(outputCs, encoding);
                 }
-                
-                
+
+
+                JsonExporter exporter = new JsonExporter(excel, lowcase, tmpExportArray, "yyyy/MM/dd", sheetName,
+                    header, excludePrefix, convertJsonStringInCeil, false);
+                exporter.SaveToFile(output, encoding);
+
+
                 //判断是否保留源文件
                 if (!keepSource)
                 {
@@ -128,14 +125,13 @@ namespace Editor
 
                 //刷新本地资源
                 AssetDatabase.Refresh();
-                
-                Close();
             }
 
             //转换完后关闭插件
             //这样做是为了解决窗口
             //再次点击时路径错误的Bug
             // window.Close();
+            Close();
         }
 
         [InfoBox("第一行字段名, 第二行中文注释，第三行类型，类型支持(int, float, bool, list, dictionary)")] [ReadOnly]
@@ -155,6 +151,7 @@ namespace Editor
             Array,
             DictObject
         }
+
         public enum FormatType
         {
             JSON,

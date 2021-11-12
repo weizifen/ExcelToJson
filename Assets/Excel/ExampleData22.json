@@ -11,7 +11,12 @@
     ],
     "EnemyIdList": [
       244
-    ]
+    ],
+    "FafDict": {
+      "s": "aa",
+      "d": "bb",
+      "f": "cc"
+    }
   },
   {
     "ID": "BS002",
@@ -21,11 +26,16 @@
     "Defence": 3,
     "Enemy": 33,
     "EnemyList": [
-      "f3"
+      "f33"
     ],
     "EnemyIdList": [
-      255
-    ]
+      266
+    ],
+    "FafDict": {
+      "s": "aa",
+      "d": "bb",
+      "f": "cc"
+    }
   },
   {
     "ID": "BS003",
@@ -35,10 +45,15 @@
     "Defence": 44,
     "Enemy": 555,
     "EnemyList": [
-      "f4"
+      "f44"
     ],
     "EnemyIdList": [
-      266
-    ]
+      255
+    ],
+    "FafDict": {
+      "s": "aa",
+      "d": "bb",
+      "f": "cc"
+    }
   }
 ]

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Data;
 using System.Text;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 
 namespace excel2json
@@ -79,8 +82,39 @@ namespace excel2json
                 return convertSheetToDict(sheet, lowcase, excludePrefix, cellJson, allString);
         }
 
+        private Dictionary<int, PropertyInfo> column2Property;
+        private Type classType;
         private object convertSheetToArray(DataTable sheet, bool lowcase, string excludePrefix, bool cellJson, bool allString)
         {
+
+            #region 第一行 记录一下字段
+            DataRow oneRow = sheet.Rows[0];
+            // get field list
+            var RuntimeAssembly = AppDomain.CurrentDomain.GetAssemblies().First(Assembly => Assembly.FullName.StartsWith("Assembly-CSharp"));
+            classType = RuntimeAssembly.GetTypes().First(type =>
+            {
+                return type.Name.Contains(sheet.TableName);
+            });
+            column2Property = new Dictionary<int, PropertyInfo>();
+            DataRow typeRow = sheet.Rows[0];
+            DataRow commentRow = sheet.Rows[1];
+
+            var index = 0;
+            foreach (DataColumn column in sheet.Columns)
+            {
+                // 过滤掉包含指定前缀的列
+                string columnName = column.ToString();
+                if (excludePrefix.Length > 0 && columnName.StartsWith(excludePrefix))
+                    continue;
+            
+                var property = classType.GetProperty(columnName, BindingFlags.Instance | BindingFlags.Public);
+                if (property != null)
+                    column2Property[index] = property;
+                index += 1;
+            }
+            
+
+            #endregion
             List<object> values = new List<object>();
 
             int firstDataRow = mHeaderRows;
@@ -128,6 +162,7 @@ namespace excel2json
         {
             var rowData = new Dictionary<string, object>();
             int col = 0;
+            object targetClass = Activator.CreateInstance(classType);
             foreach (DataColumn column in sheet.Columns)
             {
                 // 过滤掉包含指定前缀的列
@@ -136,22 +171,22 @@ namespace excel2json
                     continue;
 
                 var dictConvert = row[column].ToString();
-                if (dictConvert.Contains("|"))
-                {
-                    var resDic = new Dictionary<object, object>();
-                    string[] strArray = dictConvert.Trim().Split('|');
-                    foreach (var each in strArray)
-                    {
-                        string keyStr = each.Split(',')[0];
-                        string valueStr = each.Split(',')[1];
-                        object key = keyStr;
-                        resDic.Add(key, valueStr);
-                        var str = JsonConvert.SerializeObject(resDic) as object;
-                        // Console.WriteLine("++++");
-                        // Console.WriteLine(str);
-                        row[column] = str;
-                    }
-                }
+                // if (dictConvert.Contains("|"))
+                // {
+                //     var resDic = new Dictionary<object, object>();
+                //     string[] strArray = dictConvert.Trim().Split('|');
+                //     foreach (var each in strArray)
+                //     {
+                //         string keyStr = each.Split(',')[0];
+                //         string valueStr = each.Split(',')[1];
+                //         object key = keyStr;
+                //         resDic.Add(key, valueStr);
+                //         var str = JsonConvert.SerializeObject(resDic) as object;
+                //         // Console.WriteLine("++++");
+                //         // Console.WriteLine(str);
+                //         row[column] = str;
+                //     }
+                // }
                 object value = row[column];
 
                 // 尝试将单元格字符串转换成 Json Array 或者 Json Object
@@ -199,8 +234,13 @@ namespace excel2json
 
                 if (string.IsNullOrEmpty(fieldName))
                     fieldName = string.Format("col_{0}", col);
-
-                rowData[fieldName] = value;
+                
+                var propertyInfo = column2Property[col];
+                object realValue = ParseStr(value.ToString(), propertyInfo.PropertyType);
+                
+                column2Property[col].SetValue(targetClass, realValue);
+                
+                rowData[fieldName] = realValue;
                 col++;
             }
 
@@ -239,5 +279,82 @@ namespace excel2json
                     writer.Write(mContext);
             }
         }
+
+        #region 解析获得真实值
+
+        private static object ParseStr(string strValue, Type propertyType)
+        {
+            if (string.IsNullOrEmpty(strValue)) strValue = String.Empty;
+            strValue = strValue.TrimEnd();
+            strValue = strValue.TrimStart();
+            //如果有一行的第一列是空，则直接跳出
+            object realValue = strValue;
+            //根据类型不同填充属性
+            //值为空
+            if (string.IsNullOrEmpty(strValue) && (propertyType.IsValueType || propertyType == typeof(string)))
+            {
+                //如果是指类型则设置默认值
+                if (propertyType.IsValueType)
+                {
+                    realValue = Activator.CreateInstance(propertyType);
+                }
+
+                if (propertyType == typeof(string))
+                {
+                    realValue = string.Empty;
+                }
+            }
+            //如果是list
+            else if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                IList list = (IList)Activator.CreateInstance(propertyType);
+                if (!string.IsNullOrEmpty(strValue))
+                {
+                    var values = strValue.Split('|');
+
+                    var genericType = propertyType.GenericTypeArguments[0];
+                    foreach (string s in values)
+                    {
+                        list.Add(ParseStr(s, genericType));
+                    }
+                }
+
+                realValue = list;
+            }
+            //如果是字典
+            else if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                IDictionary dic = (IDictionary)Activator.CreateInstance(propertyType);
+                if (!string.IsNullOrEmpty(strValue))
+                {
+                    var values = strValue.Split('|');
+                    var keyType = propertyType.GenericTypeArguments[0];
+                    var valueType = propertyType.GenericTypeArguments[1];
+                    foreach (var s in values)
+                    {
+                        var keyValues = s.Split(':');
+                        var key = ParseStr(keyValues[0], keyType);
+                        var val = ParseStr(keyValues[1], valueType);
+                        dic.Add(key, val);
+                    }
+                }
+
+                realValue = dic;
+            }
+            //如果是枚举
+            else if (propertyType.IsEnum)
+            {
+                realValue = Enum.Parse(propertyType, strValue);
+            }
+            //基础类型
+            else
+            {
+                realValue = Convert.ChangeType(strValue, propertyType);
+            }
+
+            return realValue;
+        }
+
+        #endregion
     }
 }

@@ -12,14 +12,15 @@ namespace HotUpdateScripts.Xiuxian
 {
 	public class NPC
 	{
-		public string ID; // 编号
-		public string AssetName; // 资源编号
-		public int HP; // 血
-		public int Attack; // 攻击
-		public int Defence; // 防御
-		public int Enemy; // 敌人
-		public List<string> EnemyList; // ["f1"]
-		public List<int> EnemyIdList; // intlist
+		public string ID { get; set; } // 编号
+		public string AssetName { get; set; } // 资源编号
+		public int HP { get; set; } // 血
+		public int Attack { get; set; } // 攻击
+		public int Defence { get; set; } // 防御
+		public int Enemy { get; set; } // 敌人
+		public List<string> EnemyList { get; set; } // f1
+		public List<int> EnemyIdList { get; set; } // intlist
+		public Dictionary<string, string> FafDict { get; set; } // sdasd
 	}
 }
 
