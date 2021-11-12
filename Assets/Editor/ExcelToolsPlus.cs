@@ -13,42 +13,57 @@ namespace Editor
 {
     public class ExcelToolsPlus : OdinEditorWindow
     {
+        [BoxGroup("基础配置")]
         [Title("资源收集")] [AssetList(Path = "Excel", CustomFilterMethod = "IsExcel")]
         public List<Object> ExcelList;
-
-        [Title("选择格式类型")] [HideLabel] [EnumPaging]
+        
+        [BoxGroup("基础配置")]
+        [LabelText("选择格式类型")] [HideLabel] [EnumPaging]
         public ExportType exportType = ExportType.Array;
         
+        [BoxGroup("基础配置")]
         [Title("选择编码类型")] [HideLabel] [ValueDropdown("codeTypeList")]
         public int codeType = 0;
-
-        [Title("小写")] [ShowInInspector] [LabelText("小写")]
+        
+        [BoxGroup("基础配置")]
+        [ShowInInspector] [LabelText("小写")]
         public bool lowcase = false;
         
+        [FoldoutGroup("扩展配置")]
         [ReadOnly][LabelText("前三行")]
         public int headerRows = 3;
         
+        [FoldoutGroup("扩展配置")]
+        [LabelText("forceSheetName")]
         public bool sheetName = false;
         
-        
-        [ReadOnly][LabelText("前三行")]
+        [FoldoutGroup("扩展配置")]
+        [ReadOnly][LabelText("忽略标志位")]
         public string excludePrefix = "#";
 
+        [FoldoutGroup("扩展配置")]
         public bool convertJsonStringInCeil = true;
 
-        [Title("选择格式类型")] [HideLabel] [EnumPaging]
+        [FoldoutGroup("扩展配置")]
+        [Title("选择格式类型")] [HideLabel] [EnumPaging][ReadOnly]
         public FormatType formatType = FormatType.JSON;
         
-
+        [BoxGroup("基础配置")]
         [Title("输出文件夹(json,csv), 默认(Assets/Excel)")] [HideLabel] [FolderPath]
         public string outPath = "Assets/Excel";
 
+        [BoxGroup("基础配置")]
         [Title("输出文件夹(cs), 默认(Assets/Excel)")] [HideLabel] [FolderPath]
         public string outCsPath = "Assets/Excel";
         
+        [BoxGroup("基础配置")]
+        [LabelText("设置命名空间")] [HideLabel]
+        public string setNamespace = "HotUpdateScripts.Xiuxian";
+        
+        [FoldoutGroup("扩展配置")]
         [Title("保留Excel源文件")] [ShowInInspector] [LabelText("保留源文件")]
         public bool keepSource = true;
-
+        
         [Button(ButtonSizes.Gigantic)]
         [LabelText("执行")]
         public void Exec()
@@ -91,7 +106,8 @@ namespace Editor
                 //-- Load Excel
                 ExcelLoader excel = new ExcelLoader(excelPath, headerRows);
 
-                bool tmpExportArray = exportType != ExportType.Array;
+                bool tmpExportArray = exportType == ExportType.Array;
+        
                 //-- export
                 JsonExporter exporter = new JsonExporter(excel, lowcase, tmpExportArray, "yyyy/MM/dd", sheetName, header, excludePrefix, convertJsonStringInCeil, false);
                 exporter.SaveToFile(output, encoding);
@@ -99,7 +115,7 @@ namespace Editor
                 //-- 生成C#定义文件
                 if (outputCs.Length > 0)
                 {
-                    CSDefineGenerator generator = new CSDefineGenerator(excelName, excel, excludePrefix);
+                    CSDefineGenerator generator = new CSDefineGenerator(excelName, excel, excludePrefix, setNamespace);
                     generator.SaveToFile(outputCs, encoding);
                 }
                 
