@@ -22,6 +22,7 @@ namespace HotUpdateScripts.Xiuxian
 		public List<int> EnemyIdList { get; set; } // intlist
 		public Dictionary<string, string> FafDict { get; set; } // sdasd
 		public bool Bb { get; set; } // bd
+		public short Enemy2 { get; set; } // dsad
 	}
 }
 

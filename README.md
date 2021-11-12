@@ -11,10 +11,11 @@
 如果字段不想被输出  需要在字段key前面加`#`
 字典的key不能为int
 ![](media/16366994033353.jpg)
-![](media/16366830892100.jpg)
 
 ## 字段名命名规范
-* `int 12`
+* `int 12` (整型)
+* `short 12`(短整型)
+* `long 12`(长整型)
 * `string av`
 * `List|string f1,f2`
 * `Dictionary|string,string  s:aa|d:bb|f:cc`

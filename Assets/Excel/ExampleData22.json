@@ -17,7 +17,8 @@
       "d": "bb",
       "f": "cc"
     },
-    "Bb": true
+    "Bb": true,
+    "Enemy2": 12
   },
   {
     "ID": "BS002",
@@ -37,7 +38,8 @@
       "d": "bb",
       "f": "cc"
     },
-    "Bb": false
+    "Bb": false,
+    "Enemy2": 15
   },
   {
     "ID": "BS003",
@@ -57,6 +59,7 @@
       "d": "bb",
       "f": "cc"
     },
-    "Bb": false
+    "Bb": false,
+    "Enemy2": 123
   }
 ]

@@ -20,6 +20,7 @@ namespace HotUpdateScripts.Xiuxian
 		public int Defence { get; set; } // 防御
 		public List<string> DateTest { get; set; } // 测试日期
 		public Dictionary<string, string> DateDict { get; set; } // 测试日期
+		
 	}
 }
 

@@ -127,6 +127,15 @@ namespace excel2json
                 type = "float";
             else if (type == "bool" || type == "Bool" || type == "BOOL")
                 type = "bool";
+            else if (type == "short" || type == "Short" || type == "SHORT")
+                type = "short";
+            else if (type == "int16" || type == "Int16" || type == "INT16")
+                type = "short";
+            else if (type == "long" || type == "Long" || type == "LONG")
+                type = "long";
+            else if (type == "Int64" || type == "Long" || type == "LONG")
+                type = "long";
+            
             else if (type.StartsWith("enum") || type.StartsWith("Enum") || type.StartsWith("ENUM"))
             {
                 type = type.Split('|').LastOrDefault().Trim();
@@ -161,6 +170,15 @@ namespace excel2json
                 type = "float";
             else if (typeName == "bool" || typeName == "Bool" || typeName == "BOOL")
                 type = "bool";
+            else if (typeName == "short" || typeName == "Short" || typeName == "SHORT")
+                type = "short";
+            else if (typeName == "int16" || typeName == "Int16" || typeName == "INT16")
+                type = "short";
+            else if (typeName == "long" || typeName == "Long" || typeName == "LONG")
+                type = "long";
+            else if (typeName == "Int64" || typeName == "Long" || typeName == "LONG")
+                type = "long";
+            
             return type;
         }
     }
