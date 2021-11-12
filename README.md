@@ -20,6 +20,7 @@
 * `List|string f1,f2`
 * `Dictionary|string,string  s:aa|d:bb|f:cc`
 * `bool  true`
+* `enum|ItemTypeEnum, A `
 
 ## 转换文件存放位置
 * 默认Assets/Excel， 可自行修改

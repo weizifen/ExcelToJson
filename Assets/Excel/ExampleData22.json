@@ -18,7 +18,8 @@
       "f": "cc"
     },
     "Bb": true,
-    "Enemy2": 12
+    "Enemy2": 12,
+    "TestEnum": 0
   },
   {
     "ID": "BS002",
@@ -39,7 +40,8 @@
       "f": "cc"
     },
     "Bb": false,
-    "Enemy2": 15
+    "Enemy2": 15,
+    "TestEnum": 1
   },
   {
     "ID": "BS003",
@@ -60,6 +62,7 @@
       "f": "cc"
     },
     "Bb": false,
-    "Enemy2": 123
+    "Enemy2": 123,
+    "TestEnum": 0
   }
 ]
