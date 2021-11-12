@@ -1,65 +1,113 @@
 ﻿[
   {
-    "ID": "BS001",
-    "HP": 100,
-    "Attack": 15,
-    "Defence": 0,
-    "Enemy": 1,
-    "EnemyList": [
+    "id": "BS001",
+    "hp": 100,
+    "attack": 15,
+    "defence": 0,
+    "enemy": 1,
+    "enemylist": [
       "f2"
     ],
-    "EnemyIdList": [
+    "enemyidlist": [
       244
     ],
-    "FafDict": {
+    "fafdict": {
       "s": "aa",
       "d": "bb",
       "f": "cc"
     },
-    "Bb": true,
-    "Enemy2": 12,
-    "TestEnum": 0
+    "bb": true,
+    "enemy2": 12,
+    "testenum": 0,
+    "finaltest1": [
+      "12",
+      "13",
+      "14"
+    ],
+    "finaltest2": {
+      "s": "aa",
+      "d": "bb",
+      "f": "cc"
+    },
+    "finaltest3": {
+      "s": "aa",
+      "d": "bb",
+      "f": "cc"
+    },
+    "finaltest4": 55
   },
   {
-    "ID": "BS002",
-    "HP": 352,
-    "Attack": 22,
-    "Defence": 3,
-    "Enemy": 33,
-    "EnemyList": [
+    "id": "BS002",
+    "hp": 352,
+    "attack": 22,
+    "defence": 3,
+    "enemy": 33,
+    "enemylist": [
       "f33"
     ],
-    "EnemyIdList": [
+    "enemyidlist": [
       266
     ],
-    "FafDict": {
+    "fafdict": {
       "s": "aa",
       "d": "bb",
       "f": "cc"
     },
-    "Bb": false,
-    "Enemy2": 15,
-    "TestEnum": 1
+    "bb": false,
+    "enemy2": 15,
+    "testenum": 1,
+    "finaltest1": [
+      "31",
+      "33",
+      "34"
+    ],
+    "finaltest2": {
+      "s": "aa",
+      "d": "bb",
+      "f": "cc"
+    },
+    "finaltest3": {
+      "s": "aa",
+      "d": "bb",
+      "f": "cc"
+    },
+    "finaltest4": 66
   },
   {
-    "ID": "BS003",
-    "HP": 332,
-    "Attack": 3,
-    "Defence": 44,
-    "Enemy": 555,
-    "EnemyList": [
+    "id": "BS003",
+    "hp": 332,
+    "attack": 3,
+    "defence": 44,
+    "enemy": 555,
+    "enemylist": [
       "f44"
     ],
-    "EnemyIdList": [
+    "enemyidlist": [
       255
     ],
-    "FafDict": {
+    "fafdict": {
       "s": "aa",
       "d": "bb",
       "f": "cc"
     },
-    "Bb": false,
-    "Enemy2": 123,
-    "TestEnum": 0
+    "bb": false,
+    "enemy2": 123,
+    "testenum": 0,
+    "finaltest1": [
+      "31",
+      "33",
+      "34"
+    ],
+    "finaltest2": {
+      "s": "aa",
+      "d": "bb",
+      "f": "cc"
+    },
+    "finaltest3": {
+      "s": "aa",
+      "d": "bb",
+      "f": "cc"
+    },
+    "finaltest4": 777
   }
 ]

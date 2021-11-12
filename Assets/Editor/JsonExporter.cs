@@ -29,7 +29,7 @@ namespace excel2json
         /// 构造函数：完成内部数据创建
         /// </summary>
         /// <param name="excel">ExcelLoader Object</param>
-        public JsonExporter(ExcelLoader excel, bool lowcase, bool exportArray, string dateFormat, bool forceSheetName, int headerRows, string excludePrefix, bool cellJson, bool allString, bool outputClient)
+        public JsonExporter(ExcelLoader excel, bool lowcase, bool exportArray, string dateFormat, bool forceSheetName, int headerRows, string excludePrefix, bool cellJson, bool allString, bool outputClient = true, bool fileLowercase = true)
         {
             mHeaderRows = headerRows - 1;
             List<DataTable> validSheets = new List<DataTable>();
@@ -56,7 +56,7 @@ namespace excel2json
             {   // single sheet
 
                 //-- convert to object
-                object sheetValue = convertSheet(validSheets[0], exportArray, lowcase, excludePrefix, cellJson, allString, outputClient);
+                object sheetValue = convertSheet(validSheets[0], exportArray, lowcase, excludePrefix, cellJson, allString, outputClient, fileLowercase);
                 //-- convert to json string
                 mContext = JsonConvert.SerializeObject(sheetValue, jsonSettings);
             }
@@ -66,7 +66,7 @@ namespace excel2json
                 Dictionary<string, object> data = new Dictionary<string, object>();
                 foreach (var sheet in validSheets)
                 {
-                    object sheetValue = convertSheet(sheet, exportArray, lowcase, excludePrefix, cellJson, allString, outputClient);
+                    object sheetValue = convertSheet(sheet, exportArray, lowcase, excludePrefix, cellJson, allString, outputClient, fileLowercase);
                     data.Add(sheet.TableName, sheetValue);
                 }
 
@@ -78,7 +78,7 @@ namespace excel2json
         private Dictionary<int, PropertyInfo> column2Property;
         private Type classType;
         
-        private object convertSheet(DataTable sheet, bool exportArray, bool lowcase, string excludePrefix, bool cellJson, bool allString, bool outputClient)
+        private object convertSheet(DataTable sheet, bool exportArray, bool lowcase, string excludePrefix, bool cellJson, bool allString, bool outputClient, bool fileLowercase)
         {
             
             #region 第一行 记录一下字段
@@ -112,6 +112,11 @@ namespace excel2json
                         columnName = columnName.Substring(2);
                     }
                 }
+
+                if (fileLowercase)
+                {
+                    columnName = columnName.ToLower();
+                }
             
                 var property = classType.GetProperty(columnName, BindingFlags.Instance | BindingFlags.Public);
                 if (property != null)
@@ -120,11 +125,11 @@ namespace excel2json
             }
             #endregion
             if (exportArray)
-                return convertSheetToArray(sheet, lowcase, excludePrefix, cellJson, allString, outputClient);
+                return convertSheetToArray(sheet, lowcase, excludePrefix, cellJson, allString, outputClient, fileLowercase);
             else
-                return convertSheetToDict(sheet, lowcase, excludePrefix, cellJson, allString, outputClient);
+                return convertSheetToDict(sheet, lowcase, excludePrefix, cellJson, allString, outputClient, fileLowercase);
         }
-        private object convertSheetToArray(DataTable sheet, bool lowcase, string excludePrefix, bool cellJson, bool allString, bool outputClient)
+        private object convertSheetToArray(DataTable sheet, bool lowcase, string excludePrefix, bool cellJson, bool allString, bool outputClient, bool fileLowercase)
         {
             List<object> values = new List<object>();
 
@@ -134,7 +139,7 @@ namespace excel2json
                 DataRow row = sheet.Rows[i];
 
                 values.Add(
-                    convertRowToDict(sheet, row, lowcase, firstDataRow, excludePrefix, cellJson, allString, outputClient)
+                    convertRowToDict(sheet, row, lowcase, firstDataRow, excludePrefix, cellJson, allString, outputClient, fileLowercase)
                     );
             }
 
@@ -144,7 +149,7 @@ namespace excel2json
         /// <summary>
         /// 以第一列为ID，转换成ID->Object的字典对象
         /// </summary>
-        private object convertSheetToDict(DataTable sheet, bool lowcase, string excludePrefix, bool cellJson, bool allString, bool outputClient)
+        private object convertSheetToDict(DataTable sheet, bool lowcase, string excludePrefix, bool cellJson, bool allString, bool outputClient, bool fileLowercase)
         {
             Dictionary<string, object> importData =
                 new Dictionary<string, object>();
@@ -157,7 +162,7 @@ namespace excel2json
                 if (ID.Length <= 0)
                     ID = string.Format("row_{0}", i);
 
-                var rowObject = convertRowToDict(sheet, row, lowcase, firstDataRow, excludePrefix, cellJson, allString, outputClient);
+                var rowObject = convertRowToDict(sheet, row, lowcase, firstDataRow, excludePrefix, cellJson, allString, outputClient, fileLowercase);
                 // 多余的字段
                 // rowObject[ID] = ID;
                 importData[ID] = rowObject;
@@ -169,7 +174,7 @@ namespace excel2json
         /// <summary>
         /// 把一行数据转换成一个对象，每一列是一个属性
         /// </summary>
-        private Dictionary<string, object> convertRowToDict(DataTable sheet, DataRow row, bool lowcase, int firstDataRow, string excludePrefix, bool cellJson, bool allString, bool outputClient)
+        private Dictionary<string, object> convertRowToDict(DataTable sheet, DataRow row, bool lowcase, int firstDataRow, string excludePrefix, bool cellJson, bool allString, bool outputClient, bool fileLowercase)
         {
             var rowData = new Dictionary<string, object>();
             int col = 0;
@@ -189,6 +194,10 @@ namespace excel2json
                     {
                         columnName = columnName.Substring(2);
                     }
+                }
+                if (fileLowercase)
+                {
+                    columnName = columnName.ToLower();
                 }
 
                 object value = row[column];

@@ -14,11 +14,16 @@
 
 ## 字段名命名规范
 * `int 12` (整型)
+* `int32 12`(整型)
 * `short 12`(短整型)
 * `long 12`(长整型)
 * `string av`
-* `List|string f1,f2`
+* `List|string f1|f2`
+* `string[] f1|f2`
 * `Dictionary|string,string  s:aa|d:bb|f:cc`
+* `dic<string,string>  s:aa|d:bb|f:cc`
+* `map<string,string>  s:aa|d:bb|f:cc`
+* `<string,string>  s:aa|d:bb|f:cc`
 * `bool  true`
 * `enum|ItemTypeEnum, A `
 

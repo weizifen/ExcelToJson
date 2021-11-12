@@ -29,7 +29,7 @@ namespace excel2json
             }
         }
 
-        public CSDefineGenerator(string excelName, ExcelLoader excel, string excludePrefix, string setNamespace, bool outputClient = true)
+        public CSDefineGenerator(string excelName, ExcelLoader excel, string excludePrefix, string setNamespace, bool outputClient = true, bool fileLowercase = true)
         {
             //-- 创建代码字符串
             StringBuilder sb = new StringBuilder();
@@ -51,7 +51,7 @@ namespace excel2json
             for (int i = 0; i < excel.Sheets.Count; i++)
             {
                 DataTable sheet = excel.Sheets[i];
-                sb.Append(_exportSheet(sheet, excludePrefix, outputClient));
+                sb.Append(_exportSheet(sheet, excludePrefix, outputClient, fileLowercase));
             }
             sb.AppendLine("}");
             sb.AppendLine();
@@ -60,7 +60,7 @@ namespace excel2json
             mCode = sb.ToString();
         }
 
-        private string _exportSheet(DataTable sheet, string excludePrefix, bool outputClient = true)
+        private string _exportSheet(DataTable sheet, string excludePrefix, bool outputClient = true, bool fileLowercase = true)
         {
             if (sheet.Columns.Count < 0 || sheet.Rows.Count < 2)
                 return "";
@@ -89,6 +89,11 @@ namespace excel2json
                     {
                         columnName = columnName.Substring(2);
                     }
+                }
+
+                if (fileLowercase)
+                {
+                    columnName = columnName.ToLower();
                 }
 
                 FieldDef field;
@@ -134,6 +139,8 @@ namespace excel2json
             string generic = "";
             if (type == "int" || type == "Int" || type == "INT")
                 type = "int";
+            else if (type == "int32" || type == "Int32" || type == "INT32")
+                type = "int";
             else if (type == "float" || type == "Float" || type == "FLOAT")
                 type = "float";
             else if (type == "bool" || type == "Bool" || type == "BOOL")
@@ -144,7 +151,7 @@ namespace excel2json
                 type = "short";
             else if (type == "long" || type == "Long" || type == "LONG")
                 type = "long";
-            else if (type == "Int64" || type == "Long" || type == "LONG")
+            else if (type == "int64" || type == "Int64" || type == "INT64")
                 type = "long";
             
             else if (type.StartsWith("enum") || type.StartsWith("Enum") || type.StartsWith("ENUM"))
@@ -153,12 +160,30 @@ namespace excel2json
             }
             else if (type.StartsWith("list") || type.StartsWith("List") || type.StartsWith("LIST"))
             {
-                generic = "<" + type.Split('|').LastOrDefault().Trim() + ">";
+                var tmpType = CheckValueType(type.Split('|').LastOrDefault().Trim());
+                generic = "<" + tmpType + ">";
+                type = "List";
+            }
+            else if (type.EndsWith("[]")) // int切片 int[] 对excel 定义go类型进行支持
+            {
+                var tmpType = CheckValueType(type.Split('[').FirstOrDefault().Trim());
+                generic = "<" + tmpType + ">";
                 type = "List";
             }
             else if (type.StartsWith("dictionary") || type.StartsWith("Dictionary") || type.StartsWith("DICTIONARY"))
             {
                 string pair = type.Split('|').LastOrDefault().Trim();
+                string keyStr = "string", valueStr = "string";
+                keyStr = CheckValueType(pair.Split(',')[0].Trim());
+                valueStr = CheckValueType(pair.Split(',')[1].Trim());
+                generic = "<" + keyStr + ", " + valueStr + ">";
+                type = "Dictionary";
+            } 
+            else if (type.StartsWith("dic<") || type.StartsWith("map<") || (type.StartsWith("<") && type.EndsWith(">"))) // dic<int32, int32>  map<int32, int32>  <int32, int32>
+            {
+                string pair = type.Split('<').LastOrDefault().Trim();
+                pair = pair.Split('>').FirstOrDefault().Trim();
+                
                 string keyStr = "string", valueStr = "string";
                 keyStr = CheckValueType(pair.Split(',')[0].Trim());
                 valueStr = CheckValueType(pair.Split(',')[1].Trim());
@@ -176,6 +201,8 @@ namespace excel2json
         {
             string type = "string";
             if (typeName == "int" || typeName == "Int" || typeName == "INT")
+                type = "int";
+            else if (type == "int32" || type == "Int32" || type == "INT32")
                 type = "int";
             else if (typeName == "float" || typeName == "Float" || typeName == "FLOAT")
                 type = "float";

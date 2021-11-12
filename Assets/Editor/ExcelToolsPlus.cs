@@ -22,8 +22,11 @@ namespace Editor
         [BoxGroup("基础配置")] [Title("选择编码类型")] [HideLabel] [ValueDropdown("codeTypeList")]
         public int codeType = 0;
 
-        [BoxGroup("基础配置")] [ShowInInspector] [LabelText("小写")]
+        [BoxGroup("基础配置")] [ShowInInspector] [LabelText("表头自动转换成小写")]
         public bool lowcase = false;
+        
+        [BoxGroup("基础配置")] [ShowInInspector] [LabelText("字段小写")]
+        public bool fileLowercase = true;
 
         [FoldoutGroup("扩展配置")] [ReadOnly] [LabelText("前三行")]
         public int headerRows = 3;
@@ -119,9 +122,8 @@ namespace Editor
                 {
                     if (outputCs.Length > 0)
                     {
-                        CSDefineGenerator generator = new CSDefineGenerator(excelName, excel, excludePrefix, setNamespace, outputClient);
+                        CSDefineGenerator generator = new CSDefineGenerator(excelName, excel, excludePrefix, setNamespace, outputClient, fileLowercase);
                         generator.SaveToFile(outputCs, encoding);
-
                         Debug.Log("tete");
                         Debug.Log(excel == null);
                     }   
@@ -129,7 +131,7 @@ namespace Editor
                 else
                 {
                     JsonExporter exporter = new JsonExporter(excel, lowcase, tmpExportArray, "yyyy/MM/dd", sheetName,
-                        header, excludePrefix, convertJsonStringInCeil, false, outputClient);
+                        header, excludePrefix, convertJsonStringInCeil, false, outputClient, fileLowercase);
                     exporter.SaveToFile(output, encoding);   
                 }
 
