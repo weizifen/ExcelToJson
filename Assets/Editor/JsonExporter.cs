@@ -345,7 +345,17 @@ namespace excel2json
                     var valueType = propertyType.GenericTypeArguments[1];
                     foreach (var s in values)
                     {
-                        var keyValues = s.Split(':');
+                        string[] keyValues;
+                        if (s.Contains(":"))
+                        {
+                            // ab:12|cd:34
+                            keyValues = s.Split(':');
+                        }
+                        else
+                        {
+                            // ab,12|cd,34
+                            keyValues = s.Split(',');
+                        }
                         var key = ParseStr(keyValues[0], keyType);
                         var val = ParseStr(keyValues[1], valueType);
                         dic.Add(key, val);
